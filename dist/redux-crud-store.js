@@ -52,51 +52,18 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(9);
+	module.exports = __webpack_require__(11);
 
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	/* global T */
-	var FETCH = exports.FETCH = 'redux-crud-store/crud/FETCH';
-	var FETCH_SUCCESS = exports.FETCH_SUCCESS = 'redux-crud-store/crud/FETCH_SUCCESS';
-	var FETCH_ERROR = exports.FETCH_ERROR = 'redux-crud-store/crud/FETCH_ERROR';
-	var FETCH_ONE = exports.FETCH_ONE = 'redux-crud-store/crud/FETCH_ONE';
-	var FETCH_ONE_SUCCESS = exports.FETCH_ONE_SUCCESS = 'redux-crud-store/crud/FETCH_ONE_SUCCESS';
-	var FETCH_ONE_ERROR = exports.FETCH_ONE_ERROR = 'redux-crud-store/crud/FETCH_ONE_ERROR';
-	var CREATE = exports.CREATE = 'redux-crud-store/crud/CREATE';
-	var CREATE_SUCCESS = exports.CREATE_SUCCESS = 'redux-crud-store/crud/CREATE_SUCCESS';
-	var CREATE_ERROR = exports.CREATE_ERROR = 'redux-crud-store/crud/CREATE_ERROR';
-	var UPDATE = exports.UPDATE = 'redux-crud-store/crud/UPDATE';
-	var UPDATE_SUCCESS = exports.UPDATE_SUCCESS = 'redux-crud-store/crud/UPDATE_SUCCESS';
-	var UPDATE_ERROR = exports.UPDATE_ERROR = 'redux-crud-store/crud/UPDATE_ERROR';
-	var DELETE = exports.DELETE = 'redux-crud-store/crud/DELETE';
-	var DELETE_SUCCESS = exports.DELETE_SUCCESS = 'redux-crud-store/crud/DELETE_SUCCESS';
-	var DELETE_ERROR = exports.DELETE_ERROR = 'redux-crud-store/crud/DELETE_ERROR';
-	var CLEAR_ACTION_STATUS = exports.CLEAR_ACTION_STATUS = 'redux-crud-store/crud/CLEAR_ACTION_STATUS';
-	var API_CALL = exports.API_CALL = 'redux-crud-store/crud/API_CALL';
-	var GARBAGE_COLLECT = exports.GARBAGE_COLLECT = 'redux-crud-store/crud/GARBAGE_COLLECT';
-	var CLEAR_MODEL_DATA = exports.CLEAR_MODEL_DATA = 'redux-crud-store/crud/CLEAR_MODEL_DATA';
-
-/***/ },
-/* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
+	exports.__esModule = true;
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -113,31 +80,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.makeIterator = makeIterator;
 	exports.log = log;
 	exports.deprecate = deprecate;
-	exports.wrapSagaDispatch = wrapSagaDispatch;
-
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 	var sym = exports.sym = function sym(id) {
 	  return '@@redux-saga/' + id;
 	};
-	var TASK = exports.TASK = sym('TASK');
-	var HELPER = exports.HELPER = sym('HELPER');
-	var MATCH = exports.MATCH = sym('MATCH');
-	var CANCEL = exports.CANCEL = sym('cancelPromise');
-	var SAGA_ACTION = exports.SAGA_ACTION = sym('SAGA_ACTION');
+
+	var TASK = /*#__PURE__*/exports.TASK = sym('TASK');
+	var HELPER = /*#__PURE__*/exports.HELPER = sym('HELPER');
+	var MATCH = /*#__PURE__*/exports.MATCH = sym('MATCH');
+	var CANCEL = /*#__PURE__*/exports.CANCEL = sym('CANCEL_PROMISE');
+	var SAGA_ACTION = /*#__PURE__*/exports.SAGA_ACTION = sym('SAGA_ACTION');
+	var SELF_CANCELLATION = /*#__PURE__*/exports.SELF_CANCELLATION = sym('SELF_CANCELLATION');
 	var konst = exports.konst = function konst(v) {
 	  return function () {
 	    return v;
 	  };
 	};
-	var kTrue = exports.kTrue = konst(true);
-	var kFalse = exports.kFalse = konst(false);
+	var kTrue = /*#__PURE__*/exports.kTrue = konst(true);
+	var kFalse = /*#__PURE__*/exports.kFalse = konst(false);
 	var noop = exports.noop = function noop() {};
 	var ident = exports.ident = function ident(v) {
 	  return v;
 	};
-
-	var isDev = exports.isDev = ("development") === 'development';
 
 	function check(value, predicate, error) {
 	  if (!predicate(value)) {
@@ -164,12 +127,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	  number: function number(n) {
 	    return typeof n === 'number';
 	  },
+	  string: function string(s) {
+	    return typeof s === 'string';
+	  },
 	  array: Array.isArray,
+	  object: function object(obj) {
+	    return obj && !is.array(obj) && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object';
+	  },
 	  promise: function promise(p) {
 	    return p && is.func(p.then);
 	  },
 	  iterator: function iterator(it) {
 	    return it && is.func(it.next) && is.func(it.throw);
+	  },
+	  iterable: function iterable(it) {
+	    return it && is.func(Symbol) ? is.func(it[Symbol.iterator]) : is.array(it);
 	  },
 	  task: function task(t) {
 	    return t && t[TASK];
@@ -181,7 +153,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return buf && is.func(buf.isEmpty) && is.func(buf.take) && is.func(buf.put);
 	  },
 	  pattern: function pattern(pat) {
-	    return pat && (typeof pat === 'string' || (typeof pat === 'undefined' ? 'undefined' : _typeof(pat)) === 'symbol' || is.func(pat) || is.array(pat));
+	    return pat && (is.string(pat) || (typeof pat === 'undefined' ? 'undefined' : _typeof(pat)) === 'symbol' || is.func(pat) || is.array(pat));
 	  },
 	  channel: function channel(ch) {
 	    return ch && is.func(ch.take) && is.func(ch.close);
@@ -194,12 +166,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
+	var object = exports.object = {
+	  assign: function assign(target, source) {
+	    for (var i in source) {
+	      if (hasOwn(source, i)) {
+	        target[i] = source[i];
+	      }
+	    }
+	  }
+	};
+
 	function remove(array, item) {
 	  var index = array.indexOf(item);
 	  if (index >= 0) {
 	    array.splice(index, 1);
 	  }
 	}
+
+	var array = exports.array = {
+	  from: function from(obj) {
+	    var arr = Array(obj.length);
+	    for (var i in obj) {
+	      if (hasOwn(obj, i)) {
+	        arr[i] = obj[i];
+	      }
+	    }
+	    return arr;
+	  }
+	};
 
 	function deferred() {
 	  var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -245,19 +239,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var _result = void 0,
 	      _error = void 0;
 
-	  return _ref = {}, _defineProperty(_ref, TASK, true), _defineProperty(_ref, 'isRunning', function isRunning() {
+	  return _ref = {}, _ref[TASK] = true, _ref.isRunning = function isRunning() {
 	    return running;
-	  }), _defineProperty(_ref, 'result', function result() {
+	  }, _ref.result = function result() {
 	    return _result;
-	  }), _defineProperty(_ref, 'error', function error() {
+	  }, _ref.error = function error() {
 	    return _error;
-	  }), _defineProperty(_ref, 'setRunning', function setRunning(b) {
+	  }, _ref.setRunning = function setRunning(b) {
 	    return running = b;
-	  }), _defineProperty(_ref, 'setResult', function setResult(r) {
+	  }, _ref.setResult = function setResult(r) {
 	    return _result = r;
-	  }), _defineProperty(_ref, 'setError', function setError(e) {
+	  }, _ref.setError = function setError(e) {
 	    return _error = e;
-	  }), _ref;
+	  }, _ref;
 	}
 
 	function autoInc() {
@@ -268,7 +262,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}
 
-	var uid = exports.uid = autoInc();
+	var uid = /*#__PURE__*/exports.uid = autoInc();
 
 	var kThrow = function kThrow(err) {
 	  throw err;
@@ -312,25 +306,673 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function deprecate(fn, deprecationWarning) {
 	  return function () {
-	    if (isDev) log('warn', deprecationWarning);
+	    if (true) log('warn', deprecationWarning);
 	    return fn.apply(undefined, arguments);
 	  };
 	}
+
+	var updateIncentive = exports.updateIncentive = function updateIncentive(deprecated, preferred) {
+	  return deprecated + ' has been deprecated in favor of ' + preferred + ', please update your code';
+	};
 
 	var internalErr = exports.internalErr = function internalErr(err) {
 	  return new Error('\n  redux-saga: Error checking hooks detected an inconsistent state. This is likely a bug\n  in redux-saga code and not yours. Thanks for reporting this in the project\'s github repo.\n  Error: ' + err + '\n');
 	};
 
-	function wrapSagaDispatch(dispatch) {
-	  return function sagaDispatch(action) {
-	    var wrappedAction = Object.defineProperty(action, SAGA_ACTION, { value: true });
-	    return dispatch(wrappedAction);
+	var createSetContextWarning = exports.createSetContextWarning = function createSetContextWarning(ctx, props) {
+	  return (ctx ? ctx + '.' : '') + 'setContext(props): argument ' + props + ' is not a plain object';
+	};
+
+	var wrapSagaDispatch = exports.wrapSagaDispatch = function wrapSagaDispatch(dispatch) {
+	  return function (action) {
+	    return dispatch(Object.defineProperty(action, SAGA_ACTION, { value: true }));
+	  };
+	};
+
+	var cloneableGenerator = exports.cloneableGenerator = function cloneableGenerator(generatorFunc) {
+	  return function () {
+	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	      args[_key] = arguments[_key];
+	    }
+
+	    var history = [];
+	    var gen = generatorFunc.apply(undefined, args);
+	    return {
+	      next: function next(arg) {
+	        history.push(arg);
+	        return gen.next(arg);
+	      },
+	      clone: function clone() {
+	        var clonedGen = cloneableGenerator(generatorFunc).apply(undefined, args);
+	        history.forEach(function (arg) {
+	          return clonedGen.next(arg);
+	        });
+	        return clonedGen;
+	      },
+	      return: function _return(value) {
+	        return gen.return(value);
+	      },
+	      throw: function _throw(exception) {
+	        return gen.throw(exception);
+	      }
+	    };
+	  };
+	};
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	/* global T */
+	var FETCH = exports.FETCH = 'redux-crud-store/crud/FETCH';
+	var FETCH_SUCCESS = exports.FETCH_SUCCESS = 'redux-crud-store/crud/FETCH_SUCCESS';
+	var FETCH_ERROR = exports.FETCH_ERROR = 'redux-crud-store/crud/FETCH_ERROR';
+	var FETCH_ONE = exports.FETCH_ONE = 'redux-crud-store/crud/FETCH_ONE';
+	var FETCH_ONE_SUCCESS = exports.FETCH_ONE_SUCCESS = 'redux-crud-store/crud/FETCH_ONE_SUCCESS';
+	var FETCH_ONE_ERROR = exports.FETCH_ONE_ERROR = 'redux-crud-store/crud/FETCH_ONE_ERROR';
+	var CREATE = exports.CREATE = 'redux-crud-store/crud/CREATE';
+	var CREATE_SUCCESS = exports.CREATE_SUCCESS = 'redux-crud-store/crud/CREATE_SUCCESS';
+	var CREATE_ERROR = exports.CREATE_ERROR = 'redux-crud-store/crud/CREATE_ERROR';
+	var UPDATE = exports.UPDATE = 'redux-crud-store/crud/UPDATE';
+	var UPDATE_SUCCESS = exports.UPDATE_SUCCESS = 'redux-crud-store/crud/UPDATE_SUCCESS';
+	var UPDATE_ERROR = exports.UPDATE_ERROR = 'redux-crud-store/crud/UPDATE_ERROR';
+	var DELETE = exports.DELETE = 'redux-crud-store/crud/DELETE';
+	var DELETE_SUCCESS = exports.DELETE_SUCCESS = 'redux-crud-store/crud/DELETE_SUCCESS';
+	var DELETE_ERROR = exports.DELETE_ERROR = 'redux-crud-store/crud/DELETE_ERROR';
+	var CLEAR_ACTION_STATUS = exports.CLEAR_ACTION_STATUS = 'redux-crud-store/crud/CLEAR_ACTION_STATUS';
+	var API_CALL = exports.API_CALL = 'redux-crud-store/crud/API_CALL';
+	var GARBAGE_COLLECT = exports.GARBAGE_COLLECT = 'redux-crud-store/crud/GARBAGE_COLLECT';
+	var CLEAR_MODEL_DATA = exports.CLEAR_MODEL_DATA = 'redux-crud-store/crud/CLEAR_MODEL_DATA';
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports.asEffect = exports.takem = exports.detach = undefined;
+	exports.take = take;
+	exports.put = put;
+	exports.all = all;
+	exports.race = race;
+	exports.call = call;
+	exports.apply = apply;
+	exports.cps = cps;
+	exports.fork = fork;
+	exports.spawn = spawn;
+	exports.join = join;
+	exports.cancel = cancel;
+	exports.select = select;
+	exports.actionChannel = actionChannel;
+	exports.cancelled = cancelled;
+	exports.flush = flush;
+	exports.getContext = getContext;
+	exports.setContext = setContext;
+	exports.takeEvery = takeEvery;
+	exports.takeLatest = takeLatest;
+	exports.throttle = throttle;
+
+	var _utils = /*#__PURE__*/__webpack_require__(1);
+
+	var _sagaHelpers = /*#__PURE__*/__webpack_require__(16);
+
+	var IO = /*#__PURE__*/(0, _utils.sym)('IO');
+	var TAKE = 'TAKE';
+	var PUT = 'PUT';
+	var ALL = 'ALL';
+	var RACE = 'RACE';
+	var CALL = 'CALL';
+	var CPS = 'CPS';
+	var FORK = 'FORK';
+	var JOIN = 'JOIN';
+	var CANCEL = 'CANCEL';
+	var SELECT = 'SELECT';
+	var ACTION_CHANNEL = 'ACTION_CHANNEL';
+	var CANCELLED = 'CANCELLED';
+	var FLUSH = 'FLUSH';
+	var GET_CONTEXT = 'GET_CONTEXT';
+	var SET_CONTEXT = 'SET_CONTEXT';
+
+	var TEST_HINT = '\n(HINT: if you are getting this errors in tests, consider using createMockTask from redux-saga/utils)';
+
+	var effect = function effect(type, payload) {
+	  var _ref;
+
+	  return _ref = {}, _ref[IO] = true, _ref[type] = payload, _ref;
+	};
+
+	var detach = exports.detach = function detach(eff) {
+	  (0, _utils.check)(asEffect.fork(eff), _utils.is.object, 'detach(eff): argument must be a fork effect');
+	  eff[FORK].detached = true;
+	  return eff;
+	};
+
+	function take() {
+	  var patternOrChannel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '*';
+
+	  if (arguments.length) {
+	    (0, _utils.check)(arguments[0], _utils.is.notUndef, 'take(patternOrChannel): patternOrChannel is undefined');
+	  }
+	  if (_utils.is.pattern(patternOrChannel)) {
+	    return effect(TAKE, { pattern: patternOrChannel });
+	  }
+	  if (_utils.is.channel(patternOrChannel)) {
+	    return effect(TAKE, { channel: patternOrChannel });
+	  }
+	  throw new Error('take(patternOrChannel): argument ' + String(patternOrChannel) + ' is not valid channel or a valid pattern');
+	}
+
+	take.maybe = function () {
+	  var eff = take.apply(undefined, arguments);
+	  eff[TAKE].maybe = true;
+	  return eff;
+	};
+
+	var takem = /*#__PURE__*/exports.takem = (0, _utils.deprecate)(take.maybe, /*#__PURE__*/(0, _utils.updateIncentive)('takem', 'take.maybe'));
+
+	function put(channel, action) {
+	  if (arguments.length > 1) {
+	    (0, _utils.check)(channel, _utils.is.notUndef, 'put(channel, action): argument channel is undefined');
+	    (0, _utils.check)(channel, _utils.is.channel, 'put(channel, action): argument ' + channel + ' is not a valid channel');
+	    (0, _utils.check)(action, _utils.is.notUndef, 'put(channel, action): argument action is undefined');
+	  } else {
+	    (0, _utils.check)(channel, _utils.is.notUndef, 'put(action): argument action is undefined');
+	    action = channel;
+	    channel = null;
+	  }
+	  return effect(PUT, { channel: channel, action: action });
+	}
+
+	put.resolve = function () {
+	  var eff = put.apply(undefined, arguments);
+	  eff[PUT].resolve = true;
+	  return eff;
+	};
+
+	put.sync = /*#__PURE__*/(0, _utils.deprecate)(put.resolve, /*#__PURE__*/(0, _utils.updateIncentive)('put.sync', 'put.resolve'));
+
+	function all(effects) {
+	  return effect(ALL, effects);
+	}
+
+	function race(effects) {
+	  return effect(RACE, effects);
+	}
+
+	function getFnCallDesc(meth, fn, args) {
+	  (0, _utils.check)(fn, _utils.is.notUndef, meth + ': argument fn is undefined');
+
+	  var context = null;
+	  if (_utils.is.array(fn)) {
+	    var _fn = fn;
+	    context = _fn[0];
+	    fn = _fn[1];
+	  } else if (fn.fn) {
+	    var _fn2 = fn;
+	    context = _fn2.context;
+	    fn = _fn2.fn;
+	  }
+	  if (context && _utils.is.string(fn) && _utils.is.func(context[fn])) {
+	    fn = context[fn];
+	  }
+	  (0, _utils.check)(fn, _utils.is.func, meth + ': argument ' + fn + ' is not a function');
+
+	  return { context: context, fn: fn, args: args };
+	}
+
+	function call(fn) {
+	  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	    args[_key - 1] = arguments[_key];
+	  }
+
+	  return effect(CALL, getFnCallDesc('call', fn, args));
+	}
+
+	function apply(context, fn) {
+	  var args = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+
+	  return effect(CALL, getFnCallDesc('apply', { context: context, fn: fn }, args));
+	}
+
+	function cps(fn) {
+	  for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+	    args[_key2 - 1] = arguments[_key2];
+	  }
+
+	  return effect(CPS, getFnCallDesc('cps', fn, args));
+	}
+
+	function fork(fn) {
+	  for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+	    args[_key3 - 1] = arguments[_key3];
+	  }
+
+	  return effect(FORK, getFnCallDesc('fork', fn, args));
+	}
+
+	function spawn(fn) {
+	  for (var _len4 = arguments.length, args = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+	    args[_key4 - 1] = arguments[_key4];
+	  }
+
+	  return detach(fork.apply(undefined, [fn].concat(args)));
+	}
+
+	function join() {
+	  for (var _len5 = arguments.length, tasks = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+	    tasks[_key5] = arguments[_key5];
+	  }
+
+	  if (tasks.length > 1) {
+	    return all(tasks.map(function (t) {
+	      return join(t);
+	    }));
+	  }
+	  var task = tasks[0];
+	  (0, _utils.check)(task, _utils.is.notUndef, 'join(task): argument task is undefined');
+	  (0, _utils.check)(task, _utils.is.task, 'join(task): argument ' + task + ' is not a valid Task object ' + TEST_HINT);
+	  return effect(JOIN, task);
+	}
+
+	function cancel() {
+	  for (var _len6 = arguments.length, tasks = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+	    tasks[_key6] = arguments[_key6];
+	  }
+
+	  if (tasks.length > 1) {
+	    return all(tasks.map(function (t) {
+	      return cancel(t);
+	    }));
+	  }
+	  var task = tasks[0];
+	  if (tasks.length === 1) {
+	    (0, _utils.check)(task, _utils.is.notUndef, 'cancel(task): argument task is undefined');
+	    (0, _utils.check)(task, _utils.is.task, 'cancel(task): argument ' + task + ' is not a valid Task object ' + TEST_HINT);
+	  }
+	  return effect(CANCEL, task || _utils.SELF_CANCELLATION);
+	}
+
+	function select(selector) {
+	  for (var _len7 = arguments.length, args = Array(_len7 > 1 ? _len7 - 1 : 0), _key7 = 1; _key7 < _len7; _key7++) {
+	    args[_key7 - 1] = arguments[_key7];
+	  }
+
+	  if (arguments.length === 0) {
+	    selector = _utils.ident;
+	  } else {
+	    (0, _utils.check)(selector, _utils.is.notUndef, 'select(selector,[...]): argument selector is undefined');
+	    (0, _utils.check)(selector, _utils.is.func, 'select(selector,[...]): argument ' + selector + ' is not a function');
+	  }
+	  return effect(SELECT, { selector: selector, args: args });
+	}
+
+	/**
+	  channel(pattern, [buffer])    => creates an event channel for store actions
+	**/
+	function actionChannel(pattern, buffer) {
+	  (0, _utils.check)(pattern, _utils.is.notUndef, 'actionChannel(pattern,...): argument pattern is undefined');
+	  if (arguments.length > 1) {
+	    (0, _utils.check)(buffer, _utils.is.notUndef, 'actionChannel(pattern, buffer): argument buffer is undefined');
+	    (0, _utils.check)(buffer, _utils.is.buffer, 'actionChannel(pattern, buffer): argument ' + buffer + ' is not a valid buffer');
+	  }
+	  return effect(ACTION_CHANNEL, { pattern: pattern, buffer: buffer });
+	}
+
+	function cancelled() {
+	  return effect(CANCELLED, {});
+	}
+
+	function flush(channel) {
+	  (0, _utils.check)(channel, _utils.is.channel, 'flush(channel): argument ' + channel + ' is not valid channel');
+	  return effect(FLUSH, channel);
+	}
+
+	function getContext(prop) {
+	  (0, _utils.check)(prop, _utils.is.string, 'getContext(prop): argument ' + prop + ' is not a string');
+	  return effect(GET_CONTEXT, prop);
+	}
+
+	function setContext(props) {
+	  (0, _utils.check)(props, _utils.is.object, (0, _utils.createSetContextWarning)(null, props));
+	  return effect(SET_CONTEXT, props);
+	}
+
+	function takeEvery(patternOrChannel, worker) {
+	  for (var _len8 = arguments.length, args = Array(_len8 > 2 ? _len8 - 2 : 0), _key8 = 2; _key8 < _len8; _key8++) {
+	    args[_key8 - 2] = arguments[_key8];
+	  }
+
+	  return fork.apply(undefined, [_sagaHelpers.takeEveryHelper, patternOrChannel, worker].concat(args));
+	}
+
+	function takeLatest(patternOrChannel, worker) {
+	  for (var _len9 = arguments.length, args = Array(_len9 > 2 ? _len9 - 2 : 0), _key9 = 2; _key9 < _len9; _key9++) {
+	    args[_key9 - 2] = arguments[_key9];
+	  }
+
+	  return fork.apply(undefined, [_sagaHelpers.takeLatestHelper, patternOrChannel, worker].concat(args));
+	}
+
+	function throttle(ms, pattern, worker) {
+	  for (var _len10 = arguments.length, args = Array(_len10 > 3 ? _len10 - 3 : 0), _key10 = 3; _key10 < _len10; _key10++) {
+	    args[_key10 - 3] = arguments[_key10];
+	  }
+
+	  return fork.apply(undefined, [_sagaHelpers.throttleHelper, ms, pattern, worker].concat(args));
+	}
+
+	var createAsEffectType = function createAsEffectType(type) {
+	  return function (effect) {
+	    return effect && effect[IO] && effect[type];
+	  };
+	};
+
+	var asEffect = exports.asEffect = {
+	  take: /*#__PURE__*/createAsEffectType(TAKE),
+	  put: /*#__PURE__*/createAsEffectType(PUT),
+	  all: /*#__PURE__*/createAsEffectType(ALL),
+	  race: /*#__PURE__*/createAsEffectType(RACE),
+	  call: /*#__PURE__*/createAsEffectType(CALL),
+	  cps: /*#__PURE__*/createAsEffectType(CPS),
+	  fork: /*#__PURE__*/createAsEffectType(FORK),
+	  join: /*#__PURE__*/createAsEffectType(JOIN),
+	  cancel: /*#__PURE__*/createAsEffectType(CANCEL),
+	  select: /*#__PURE__*/createAsEffectType(SELECT),
+	  actionChannel: /*#__PURE__*/createAsEffectType(ACTION_CHANNEL),
+	  cancelled: /*#__PURE__*/createAsEffectType(CANCELLED),
+	  flush: /*#__PURE__*/createAsEffectType(FLUSH),
+	  getContext: /*#__PURE__*/createAsEffectType(GET_CONTEXT),
+	  setContext: /*#__PURE__*/createAsEffectType(SET_CONTEXT)
+	};
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports.UNDEFINED_INPUT_ERROR = exports.INVALID_BUFFER = exports.isEnd = exports.END = undefined;
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	exports.emitter = emitter;
+	exports.channel = channel;
+	exports.eventChannel = eventChannel;
+	exports.stdChannel = stdChannel;
+
+	var _utils = /*#__PURE__*/__webpack_require__(1);
+
+	var _buffers = /*#__PURE__*/__webpack_require__(7);
+
+	var _scheduler = /*#__PURE__*/__webpack_require__(20);
+
+	var CHANNEL_END_TYPE = '@@redux-saga/CHANNEL_END';
+	var END = exports.END = { type: CHANNEL_END_TYPE };
+	var isEnd = exports.isEnd = function isEnd(a) {
+	  return a && a.type === CHANNEL_END_TYPE;
+	};
+
+	function emitter() {
+	  var subscribers = [];
+
+	  function subscribe(sub) {
+	    subscribers.push(sub);
+	    return function () {
+	      return (0, _utils.remove)(subscribers, sub);
+	    };
+	  }
+
+	  function emit(item) {
+	    var arr = subscribers.slice();
+	    for (var i = 0, len = arr.length; i < len; i++) {
+	      arr[i](item);
+	    }
+	  }
+
+	  return {
+	    subscribe: subscribe,
+	    emit: emit
 	  };
 	}
 
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
+	var INVALID_BUFFER = exports.INVALID_BUFFER = 'invalid buffer passed to channel factory function';
+	var UNDEFINED_INPUT_ERROR = exports.UNDEFINED_INPUT_ERROR = 'Saga was provided with an undefined action';
+
+	if (true) {
+	  exports.UNDEFINED_INPUT_ERROR = UNDEFINED_INPUT_ERROR += '\nHints:\n    - check that your Action Creator returns a non-undefined value\n    - if the Saga was started using runSaga, check that your subscribe source provides the action to its listeners\n  ';
+	}
+
+	function channel() {
+	  var buffer = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _buffers.buffers.fixed();
+
+	  var closed = false;
+	  var takers = [];
+
+	  (0, _utils.check)(buffer, _utils.is.buffer, INVALID_BUFFER);
+
+	  function checkForbiddenStates() {
+	    if (closed && takers.length) {
+	      throw (0, _utils.internalErr)('Cannot have a closed channel with pending takers');
+	    }
+	    if (takers.length && !buffer.isEmpty()) {
+	      throw (0, _utils.internalErr)('Cannot have pending takers with non empty buffer');
+	    }
+	  }
+
+	  function put(input) {
+	    checkForbiddenStates();
+	    (0, _utils.check)(input, _utils.is.notUndef, UNDEFINED_INPUT_ERROR);
+	    if (closed) {
+	      return;
+	    }
+	    if (!takers.length) {
+	      return buffer.put(input);
+	    }
+	    for (var i = 0; i < takers.length; i++) {
+	      var cb = takers[i];
+	      if (!cb[_utils.MATCH] || cb[_utils.MATCH](input)) {
+	        takers.splice(i, 1);
+	        return cb(input);
+	      }
+	    }
+	  }
+
+	  function take(cb) {
+	    checkForbiddenStates();
+	    (0, _utils.check)(cb, _utils.is.func, "channel.take's callback must be a function");
+
+	    if (closed && buffer.isEmpty()) {
+	      cb(END);
+	    } else if (!buffer.isEmpty()) {
+	      cb(buffer.take());
+	    } else {
+	      takers.push(cb);
+	      cb.cancel = function () {
+	        return (0, _utils.remove)(takers, cb);
+	      };
+	    }
+	  }
+
+	  function flush(cb) {
+	    checkForbiddenStates(); // TODO: check if some new state should be forbidden now
+	    (0, _utils.check)(cb, _utils.is.func, "channel.flush' callback must be a function");
+	    if (closed && buffer.isEmpty()) {
+	      cb(END);
+	      return;
+	    }
+	    cb(buffer.flush());
+	  }
+
+	  function close() {
+	    checkForbiddenStates();
+	    if (!closed) {
+	      closed = true;
+	      if (takers.length) {
+	        var arr = takers;
+	        takers = [];
+	        for (var i = 0, len = arr.length; i < len; i++) {
+	          arr[i](END);
+	        }
+	      }
+	    }
+	  }
+
+	  return {
+	    take: take,
+	    put: put,
+	    flush: flush,
+	    close: close,
+	    get __takers__() {
+	      return takers;
+	    },
+	    get __closed__() {
+	      return closed;
+	    }
+	  };
+	}
+
+	function eventChannel(subscribe) {
+	  var buffer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _buffers.buffers.none();
+	  var matcher = arguments[2];
+
+	  /**
+	    should be if(typeof matcher !== undefined) instead?
+	    see PR #273 for a background discussion
+	  **/
+	  if (arguments.length > 2) {
+	    (0, _utils.check)(matcher, _utils.is.func, 'Invalid match function passed to eventChannel');
+	  }
+
+	  var chan = channel(buffer);
+	  var close = function close() {
+	    if (!chan.__closed__) {
+	      if (unsubscribe) {
+	        unsubscribe();
+	      }
+	      chan.close();
+	    }
+	  };
+	  var unsubscribe = subscribe(function (input) {
+	    if (isEnd(input)) {
+	      close();
+	      return;
+	    }
+	    if (matcher && !matcher(input)) {
+	      return;
+	    }
+	    chan.put(input);
+	  });
+	  if (chan.__closed__) {
+	    unsubscribe();
+	  }
+
+	  if (!_utils.is.func(unsubscribe)) {
+	    throw new Error('in eventChannel: subscribe should return a function to unsubscribe');
+	  }
+
+	  return {
+	    take: chan.take,
+	    flush: chan.flush,
+	    close: close
+	  };
+	}
+
+	function stdChannel(subscribe) {
+	  var chan = eventChannel(function (cb) {
+	    return subscribe(function (input) {
+	      if (input[_utils.SAGA_ACTION]) {
+	        cb(input);
+	        return;
+	      }
+	      (0, _scheduler.asap)(function () {
+	        return cb(input);
+	      });
+	    });
+	  });
+
+	  return _extends({}, chan, {
+	    take: function take(cb, matcher) {
+	      if (arguments.length > 1) {
+	        (0, _utils.check)(matcher, _utils.is.func, "channel.take's matcher argument must be a function");
+	        cb[_utils.MATCH] = matcher;
+	      }
+	      chan.take(cb);
+	    }
+	  });
+	}
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports.qEnd = undefined;
+	exports.safeName = safeName;
+	exports.default = fsmIterator;
+
+	var _utils = /*#__PURE__*/__webpack_require__(1);
+
+	var done = { done: true, value: undefined };
+	var qEnd = exports.qEnd = {};
+
+	function safeName(patternOrChannel) {
+	  if (_utils.is.channel(patternOrChannel)) {
+	    return 'channel';
+	  } else if (Array.isArray(patternOrChannel)) {
+	    return String(patternOrChannel.map(function (entry) {
+	      return String(entry);
+	    }));
+	  } else {
+	    return String(patternOrChannel);
+	  }
+	}
+
+	function fsmIterator(fsm, q0) {
+	  var name = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'iterator';
+
+	  var updateState = void 0,
+	      qNext = q0;
+
+	  function next(arg, error) {
+	    if (qNext === qEnd) {
+	      return done;
+	    }
+
+	    if (error) {
+	      qNext = qEnd;
+	      throw error;
+	    } else {
+	      updateState && updateState(arg);
+
+	      var _fsm$qNext = fsm[qNext](),
+	          q = _fsm$qNext[0],
+	          output = _fsm$qNext[1],
+	          _updateState = _fsm$qNext[2];
+
+	      qNext = q;
+	      updateState = _updateState;
+	      return qNext === qEnd ? done : output;
+	    }
+	  }
+
+	  return (0, _utils.makeIterator)(next, function (error) {
+	    return next(null, error);
+	  }, name, true);
+	}
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, module) {/**
 	 * Lodash (Custom Build) <https://lodash.com/>
@@ -2181,22 +2823,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = isEqual;
 
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(20)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(23)(module)))
 
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
+	exports.__esModule = true;
 	exports.buffers = exports.BUFFER_OVERFLOW = undefined;
 
-	var _utils = __webpack_require__(2);
+	var _utils = /*#__PURE__*/__webpack_require__(1);
 
-	var BUFFER_OVERFLOW = exports.BUFFER_OVERFLOW = 'Channel\'s Buffer overflow!';
+	var BUFFER_OVERFLOW = exports.BUFFER_OVERFLOW = "Channel's Buffer overflow!";
 
 	var ON_OVERFLOW_THROW = 1;
 	var ON_OVERFLOW_DROP = 2;
@@ -2274,7 +2914,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 	    },
-	    take: take, flush: flush
+	    take: take,
+	    flush: flush
 	  };
 	}
 
@@ -2296,284 +2937,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.asEffect = exports.takem = undefined;
-
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-	exports.take = take;
-	exports.put = put;
-	exports.race = race;
-	exports.call = call;
-	exports.apply = apply;
-	exports.cps = cps;
-	exports.fork = fork;
-	exports.spawn = spawn;
-	exports.join = join;
-	exports.cancel = cancel;
-	exports.select = select;
-	exports.actionChannel = actionChannel;
-	exports.cancelled = cancelled;
-	exports.flush = flush;
-	exports.takeEvery = takeEvery;
-	exports.takeLatest = takeLatest;
-	exports.throttle = throttle;
-
-	var _utils = __webpack_require__(2);
-
-	var _sagaHelpers = __webpack_require__(16);
-
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-	var IO = (0, _utils.sym)('IO');
-	var TAKE = 'TAKE';
-	var PUT = 'PUT';
-	var RACE = 'RACE';
-	var CALL = 'CALL';
-	var CPS = 'CPS';
-	var FORK = 'FORK';
-	var JOIN = 'JOIN';
-	var CANCEL = 'CANCEL';
-	var SELECT = 'SELECT';
-	var ACTION_CHANNEL = 'ACTION_CHANNEL';
-	var CANCELLED = 'CANCELLED';
-	var FLUSH = 'FLUSH';
-
-	var deprecationWarning = function deprecationWarning(deprecated, preferred) {
-	  return deprecated + ' has been deprecated in favor of ' + preferred + ', please update your code';
-	};
-
-	var effect = function effect(type, payload) {
-	  var _ref;
-
-	  return _ref = {}, _defineProperty(_ref, IO, true), _defineProperty(_ref, type, payload), _ref;
-	};
-
-	function take() {
-	  var patternOrChannel = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '*';
-
-	  if (arguments.length) {
-	    (0, _utils.check)(arguments[0], _utils.is.notUndef, 'take(patternOrChannel): patternOrChannel is undefined');
-	  }
-	  if (_utils.is.pattern(patternOrChannel)) {
-	    return effect(TAKE, { pattern: patternOrChannel });
-	  }
-	  if (_utils.is.channel(patternOrChannel)) {
-	    return effect(TAKE, { channel: patternOrChannel });
-	  }
-	  throw new Error('take(patternOrChannel): argument ' + String(patternOrChannel) + ' is not valid channel or a valid pattern');
-	}
-
-	take.maybe = function () {
-	  var eff = take.apply(undefined, arguments);
-	  eff[TAKE].maybe = true;
-	  return eff;
-	};
-
-	var takem = exports.takem = (0, _utils.deprecate)(take.maybe, deprecationWarning('takem', 'take.maybe'));
-
-	function put(channel, action) {
-	  if (arguments.length > 1) {
-	    (0, _utils.check)(channel, _utils.is.notUndef, 'put(channel, action): argument channel is undefined');
-	    (0, _utils.check)(channel, _utils.is.channel, 'put(channel, action): argument ' + channel + ' is not a valid channel');
-	    (0, _utils.check)(action, _utils.is.notUndef, 'put(channel, action): argument action is undefined');
-	  } else {
-	    (0, _utils.check)(channel, _utils.is.notUndef, 'put(action): argument action is undefined');
-	    action = channel;
-	    channel = null;
-	  }
-	  return effect(PUT, { channel: channel, action: action });
-	}
-
-	put.resolve = function () {
-	  var eff = put.apply(undefined, arguments);
-	  eff[PUT].resolve = true;
-	  return eff;
-	};
-
-	put.sync = (0, _utils.deprecate)(put.resolve, deprecationWarning('put.sync', 'put.resolve'));
-
-	function race(effects) {
-	  return effect(RACE, effects);
-	}
-
-	function getFnCallDesc(meth, fn, args) {
-	  (0, _utils.check)(fn, _utils.is.notUndef, meth + ': argument fn is undefined');
-
-	  var context = null;
-	  if (_utils.is.array(fn)) {
-	    var _fn = fn;
-
-	    var _fn2 = _slicedToArray(_fn, 2);
-
-	    context = _fn2[0];
-	    fn = _fn2[1];
-	  } else if (fn.fn) {
-	    var _fn3 = fn;
-	    context = _fn3.context;
-	    fn = _fn3.fn;
-	  }
-	  (0, _utils.check)(fn, _utils.is.func, meth + ': argument ' + fn + ' is not a function');
-
-	  return { context: context, fn: fn, args: args };
-	}
-
-	function call(fn) {
-	  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	    args[_key - 1] = arguments[_key];
-	  }
-
-	  return effect(CALL, getFnCallDesc('call', fn, args));
-	}
-
-	function apply(context, fn) {
-	  var args = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
-
-	  return effect(CALL, getFnCallDesc('apply', { context: context, fn: fn }, args));
-	}
-
-	function cps(fn) {
-	  for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-	    args[_key2 - 1] = arguments[_key2];
-	  }
-
-	  return effect(CPS, getFnCallDesc('cps', fn, args));
-	}
-
-	function fork(fn) {
-	  for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-	    args[_key3 - 1] = arguments[_key3];
-	  }
-
-	  return effect(FORK, getFnCallDesc('fork', fn, args));
-	}
-
-	function spawn(fn) {
-	  for (var _len4 = arguments.length, args = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-	    args[_key4 - 1] = arguments[_key4];
-	  }
-
-	  var eff = fork.apply(undefined, [fn].concat(args));
-	  eff[FORK].detached = true;
-	  return eff;
-	}
-
-	var isForkedTask = function isForkedTask(task) {
-	  return task[_utils.TASK];
-	};
-
-	function join(task) {
-	  if (_utils.is.array(task)) {
-	    return task.map(join);
-	  }
-	  (0, _utils.check)(task, _utils.is.notUndef, 'join(task): argument task is undefined');
-	  if (!isForkedTask(task)) {
-	    throw new Error('join(task): argument ' + task + ' is not a valid Task object \n(HINT: if you are getting this errors in tests, consider using createMockTask from redux-saga/utils)');
-	  }
-
-	  return effect(JOIN, task);
-	}
-
-	function cancel(task) {
-	  (0, _utils.check)(task, _utils.is.notUndef, 'cancel(task): argument task is undefined');
-	  if (!isForkedTask(task)) {
-	    throw new Error('cancel(task): argument ' + task + ' is not a valid Task object \n(HINT: if you are getting this errors in tests, consider using createMockTask from redux-saga/utils)');
-	  }
-
-	  return effect(CANCEL, task);
-	}
-
-	function select(selector) {
-	  for (var _len5 = arguments.length, args = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
-	    args[_key5 - 1] = arguments[_key5];
-	  }
-
-	  if (arguments.length === 0) {
-	    selector = _utils.ident;
-	  } else {
-	    (0, _utils.check)(selector, _utils.is.notUndef, 'select(selector,[...]): argument selector is undefined');
-	    (0, _utils.check)(selector, _utils.is.func, 'select(selector,[...]): argument ' + selector + ' is not a function');
-	  }
-	  return effect(SELECT, { selector: selector, args: args });
-	}
-
-	/**
-	  channel(pattern, [buffer])    => creates an event channel for store actions
-	**/
-	function actionChannel(pattern, buffer) {
-	  (0, _utils.check)(pattern, _utils.is.notUndef, 'actionChannel(pattern,...): argument pattern is undefined');
-	  if (arguments.length > 1) {
-	    (0, _utils.check)(buffer, _utils.is.notUndef, 'actionChannel(pattern, buffer): argument buffer is undefined');
-	    (0, _utils.check)(buffer, _utils.is.buffer, 'actionChannel(pattern, buffer): argument ' + buffer + ' is not a valid buffer');
-	  }
-	  return effect(ACTION_CHANNEL, { pattern: pattern, buffer: buffer });
-	}
-
-	function cancelled() {
-	  return effect(CANCELLED, {});
-	}
-
-	function flush(channel) {
-	  (0, _utils.check)(channel, _utils.is.channel, 'flush(channel): argument ' + channel + ' is not valid channel');
-	  return effect(FLUSH, channel);
-	}
-
-	function takeEvery(patternOrChannel, worker) {
-	  for (var _len6 = arguments.length, args = Array(_len6 > 2 ? _len6 - 2 : 0), _key6 = 2; _key6 < _len6; _key6++) {
-	    args[_key6 - 2] = arguments[_key6];
-	  }
-
-	  return fork.apply(undefined, [_sagaHelpers.takeEveryHelper, patternOrChannel, worker].concat(args));
-	}
-
-	function takeLatest(patternOrChannel, worker) {
-	  for (var _len7 = arguments.length, args = Array(_len7 > 2 ? _len7 - 2 : 0), _key7 = 2; _key7 < _len7; _key7++) {
-	    args[_key7 - 2] = arguments[_key7];
-	  }
-
-	  return fork.apply(undefined, [_sagaHelpers.takeLatestHelper, patternOrChannel, worker].concat(args));
-	}
-
-	function throttle(ms, pattern, worker) {
-	  for (var _len8 = arguments.length, args = Array(_len8 > 3 ? _len8 - 3 : 0), _key8 = 3; _key8 < _len8; _key8++) {
-	    args[_key8 - 3] = arguments[_key8];
-	  }
-
-	  return fork.apply(undefined, [_sagaHelpers.throttleHelper, ms, pattern, worker].concat(args));
-	}
-
-	var createAsEffectType = function createAsEffectType(type) {
-	  return function (effect) {
-	    return effect && effect[IO] && effect[type];
-	  };
-	};
-
-	var asEffect = exports.asEffect = {
-	  take: createAsEffectType(TAKE),
-	  put: createAsEffectType(PUT),
-	  race: createAsEffectType(RACE),
-	  call: createAsEffectType(CALL),
-	  cps: createAsEffectType(CPS),
-	  fork: createAsEffectType(FORK),
-	  join: createAsEffectType(JOIN),
-	  cancel: createAsEffectType(CANCEL),
-	  select: createAsEffectType(SELECT),
-	  actionChannel: createAsEffectType(ACTION_CHANNEL),
-	  cancelled: createAsEffectType(CANCELLED),
-	  flush: createAsEffectType(FLUSH)
-	};
-
-/***/ },
-/* 6 */
-/***/ function(module, exports) {
+/***/ }),
+/* 8 */
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -2709,9 +3075,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.default = ApiClient;
 
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -2731,7 +3097,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.apiCall = apiCall;
 	exports.clearModelData = clearModelData;
 
-	var _actionTypes = __webpack_require__(1);
+	var _actionTypes = __webpack_require__(2);
 
 	function fetchCollection(model, path) {
 	  var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -2896,9 +3262,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}
 
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -2912,9 +3278,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -2923,7 +3289,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.selectActionStatus = exports.selectRecordOrEmptyObject = exports.selectRecord = exports.selectCollection = exports.select = exports.clearModelData = exports.apiCall = exports.clearActionStatus = exports.deleteRecord = exports.updateRecord = exports.createRecord = exports.fetchRecord = exports.fetchCollection = exports.ApiClient = exports.crudActions = exports.crudReducer = exports.crudSaga = undefined;
 
-	var _actionCreators = __webpack_require__(7);
+	var _actionCreators = __webpack_require__(9);
 
 	Object.defineProperty(exports, 'fetchCollection', {
 	  enumerable: true,
@@ -2974,7 +3340,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 
-	var _selectors = __webpack_require__(12);
+	var _selectors = __webpack_require__(14);
 
 	Object.defineProperty(exports, 'select', {
 	  enumerable: true,
@@ -3007,19 +3373,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 
-	var _sagas = __webpack_require__(11);
+	var _sagas = __webpack_require__(13);
 
 	var _sagas2 = _interopRequireDefault(_sagas);
 
-	var _reducers = __webpack_require__(10);
+	var _reducers = __webpack_require__(12);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
-	var _actionTypes = __webpack_require__(1);
+	var _actionTypes = __webpack_require__(2);
 
 	var crudActions = _interopRequireWildcard(_actionTypes);
 
-	var _ApiClient = __webpack_require__(6);
+	var _ApiClient = __webpack_require__(8);
 
 	var _ApiClient2 = _interopRequireDefault(_ApiClient);
 
@@ -3032,9 +3398,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.crudActions = crudActions;
 	exports.ApiClient = _ApiClient2.default;
 
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -3043,15 +3409,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.modelReducer = exports.actionStatusReducer = exports.collectionsReducer = exports.collectionReducer = exports.byIdReducer = exports.modelInitialState = undefined;
 
-	var _lodash = __webpack_require__(3);
+	var _lodash = __webpack_require__(6);
 
 	var _lodash2 = _interopRequireDefault(_lodash);
 
-	var _devMessage = __webpack_require__(8);
+	var _devMessage = __webpack_require__(10);
 
 	var _devMessage2 = _interopRequireDefault(_devMessage);
 
-	var _actionTypes = __webpack_require__(1);
+	var _actionTypes = __webpack_require__(2);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3083,10 +3449,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  byId: byIdInitialState,
 	  collections: collectionsInitialState,
 	  actionStatus: actionStatusInitialState
-	};
 
-	// holds a number of models, each of which are strucured like modelInitialState
-	var initialState = {};
+	  // holds a number of models, each of which are strucured like modelInitialState
+	};var initialState = {};
 
 	/*
 	 * SECTION: reducers
@@ -3182,7 +3547,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    case _actionTypes.FETCH_SUCCESS:
 	      var originalPayload = action.payload || {};
 	      var payload = 'data' in originalPayload ? originalPayload.data : originalPayload;
-	      var otherInfo = 'data' in originalPayload ? originalPayload : {};
+	      var otherInfo = 'data' in originalPayload ? Object.assign({}, originalPayload) : {};
 	      delete otherInfo.data;
 	      if (!Array.isArray(payload)) {
 	        (0, _devMessage2.default)('\n          Payload is not an array! Your server response for a FETCH action\n          should be in one of the following forms:\n\n          { data: [ ... ] }\n\n          or\n\n          [ ... ]\n        \n          Here are the contents of your action:');
@@ -3436,9 +3801,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.modelReducer = modelReducerImpl;
 	exports.default = crudReducer;
 
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -3452,9 +3817,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.default = crudSaga;
 
-	var _effects = __webpack_require__(13);
+	var _effects = __webpack_require__(15);
 
-	var _actionTypes = __webpack_require__(1);
+	var _actionTypes = __webpack_require__(2);
 
 	// Generator type parameters are: Generator<+Yield,+Return,-Next>
 
@@ -3464,7 +3829,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	// TODO: The `Effect` type is not actually defined. Because 'redux-saga' does
 	// not use  annotations, flow pretends that this import succeeds.
-	var regeneratorRuntime = __webpack_require__(18);
+	var regeneratorRuntime = __webpack_require__(21);
 
 	var delay = function delay(ms) {
 	  return new Promise(function (resolve) {
@@ -3472,7 +3837,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	};
 
-	var garbageCollector = regeneratorRuntime.mark(function garbageCollector() {
+	var garbageCollector = /*#__PURE__*/regeneratorRuntime.mark(function garbageCollector() {
 	  return regeneratorRuntime.wrap(function garbageCollector$(_context) {
 	    while (1) {
 	      switch (_context.prev = _context.next) {
@@ -3501,175 +3866,183 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 	var apiGeneric = exports.apiGeneric = function apiGeneric(apiClient) {
-	  return regeneratorRuntime.mark(function _apiGeneric(action) {
-	    var _action$payload, method, path, params, data, fetchConfig, _action$meta, success, failure, meta, response;
+	  return (/*#__PURE__*/regeneratorRuntime.mark(function _apiGeneric(action) {
+	      var _action$payload, method, path, params, data, fetchConfig, _action$meta, success, failure, meta, response;
 
-	    return regeneratorRuntime.wrap(function _apiGeneric$(_context2) {
-	      while (1) {
-	        switch (_context2.prev = _context2.next) {
-	          case 0:
-	            _action$payload = action.payload, method = _action$payload.method, path = _action$payload.path, params = _action$payload.params, data = _action$payload.data, fetchConfig = _action$payload.fetchConfig;
-	            _action$meta = action.meta, success = _action$meta.success, failure = _action$meta.failure;
-	            meta = _extends({}, action.meta, {
-	              fetchTime: Date.now()
-	            });
-	            _context2.prev = 3;
-	            _context2.next = 6;
-	            return (0, _effects.call)(apiClient[method], path, { params: params, data: data, fetchConfig: fetchConfig });
+	      return regeneratorRuntime.wrap(function _apiGeneric$(_context2) {
+	        while (1) {
+	          switch (_context2.prev = _context2.next) {
+	            case 0:
+	              _action$payload = action.payload, method = _action$payload.method, path = _action$payload.path, params = _action$payload.params, data = _action$payload.data, fetchConfig = _action$payload.fetchConfig;
+	              _action$meta = action.meta, success = _action$meta.success, failure = _action$meta.failure;
+	              meta = _extends({}, action.meta, {
+	                fetchTime: Date.now()
+	              });
+	              _context2.prev = 3;
+	              _context2.next = 6;
+	              return (0, _effects.call)(apiClient[method], path, { params: params, data: data, fetchConfig: fetchConfig });
 
-	          case 6:
-	            response = _context2.sent;
-	            _context2.next = 9;
-	            return (0, _effects.put)({ meta: meta, type: success, payload: response });
+	            case 6:
+	              response = _context2.sent;
+	              _context2.next = 9;
+	              return (0, _effects.put)({ meta: meta, type: success, payload: response });
 
-	          case 9:
-	            _context2.next = 15;
-	            break;
+	            case 9:
+	              _context2.next = 15;
+	              break;
 
-	          case 11:
-	            _context2.prev = 11;
-	            _context2.t0 = _context2['catch'](3);
-	            _context2.next = 15;
-	            return (0, _effects.put)({ meta: meta, type: failure, payload: _context2.t0, error: true });
+	            case 11:
+	              _context2.prev = 11;
+	              _context2.t0 = _context2['catch'](3);
+	              _context2.next = 15;
+	              return (0, _effects.put)({ meta: meta, type: failure, payload: _context2.t0, error: true });
 
-	          case 15:
-	          case 'end':
-	            return _context2.stop();
+	            case 15:
+	            case 'end':
+	              return _context2.stop();
+	          }
 	        }
-	      }
-	    }, _apiGeneric, this, [[3, 11]]);
-	  });
+	      }, _apiGeneric, this, [[3, 11]]);
+	    })
+	  );
 	};
 
 	var watchFetch = function watchFetch(apiClient) {
-	  return regeneratorRuntime.mark(function _watchFetch() {
-	    return regeneratorRuntime.wrap(function _watchFetch$(_context3) {
-	      while (1) {
-	        switch (_context3.prev = _context3.next) {
-	          case 0:
-	            _context3.next = 2;
-	            return (0, _effects.takeEvery)(_actionTypes.FETCH, apiGeneric(apiClient));
+	  return (/*#__PURE__*/regeneratorRuntime.mark(function _watchFetch() {
+	      return regeneratorRuntime.wrap(function _watchFetch$(_context3) {
+	        while (1) {
+	          switch (_context3.prev = _context3.next) {
+	            case 0:
+	              _context3.next = 2;
+	              return (0, _effects.takeEvery)(_actionTypes.FETCH, apiGeneric(apiClient));
 
-	          case 2:
-	          case 'end':
-	            return _context3.stop();
+	            case 2:
+	            case 'end':
+	              return _context3.stop();
+	          }
 	        }
-	      }
-	    }, _watchFetch, this);
-	  });
+	      }, _watchFetch, this);
+	    })
+	  );
 	};
 
 	var watchFetchOne = function watchFetchOne(apiClient) {
-	  return regeneratorRuntime.mark(function _watchFetchOne() {
-	    return regeneratorRuntime.wrap(function _watchFetchOne$(_context4) {
-	      while (1) {
-	        switch (_context4.prev = _context4.next) {
-	          case 0:
-	            _context4.next = 2;
-	            return (0, _effects.takeEvery)(_actionTypes.FETCH_ONE, apiGeneric(apiClient));
+	  return (/*#__PURE__*/regeneratorRuntime.mark(function _watchFetchOne() {
+	      return regeneratorRuntime.wrap(function _watchFetchOne$(_context4) {
+	        while (1) {
+	          switch (_context4.prev = _context4.next) {
+	            case 0:
+	              _context4.next = 2;
+	              return (0, _effects.takeEvery)(_actionTypes.FETCH_ONE, apiGeneric(apiClient));
 
-	          case 2:
-	          case 'end':
-	            return _context4.stop();
+	            case 2:
+	            case 'end':
+	              return _context4.stop();
+	          }
 	        }
-	      }
-	    }, _watchFetchOne, this);
-	  });
+	      }, _watchFetchOne, this);
+	    })
+	  );
 	};
 
 	var watchCreate = function watchCreate(apiClient) {
-	  return regeneratorRuntime.mark(function _watchCreate() {
-	    return regeneratorRuntime.wrap(function _watchCreate$(_context5) {
-	      while (1) {
-	        switch (_context5.prev = _context5.next) {
-	          case 0:
-	            _context5.next = 2;
-	            return (0, _effects.takeEvery)(_actionTypes.CREATE, apiGeneric(apiClient));
+	  return (/*#__PURE__*/regeneratorRuntime.mark(function _watchCreate() {
+	      return regeneratorRuntime.wrap(function _watchCreate$(_context5) {
+	        while (1) {
+	          switch (_context5.prev = _context5.next) {
+	            case 0:
+	              _context5.next = 2;
+	              return (0, _effects.takeEvery)(_actionTypes.CREATE, apiGeneric(apiClient));
 
-	          case 2:
-	          case 'end':
-	            return _context5.stop();
+	            case 2:
+	            case 'end':
+	              return _context5.stop();
+	          }
 	        }
-	      }
-	    }, _watchCreate, this);
-	  });
+	      }, _watchCreate, this);
+	    })
+	  );
 	};
 
 	var watchUpdate = function watchUpdate(apiClient) {
-	  return regeneratorRuntime.mark(function _watchUpdate() {
-	    return regeneratorRuntime.wrap(function _watchUpdate$(_context6) {
-	      while (1) {
-	        switch (_context6.prev = _context6.next) {
-	          case 0:
-	            _context6.next = 2;
-	            return (0, _effects.takeEvery)(_actionTypes.UPDATE, apiGeneric(apiClient));
+	  return (/*#__PURE__*/regeneratorRuntime.mark(function _watchUpdate() {
+	      return regeneratorRuntime.wrap(function _watchUpdate$(_context6) {
+	        while (1) {
+	          switch (_context6.prev = _context6.next) {
+	            case 0:
+	              _context6.next = 2;
+	              return (0, _effects.takeEvery)(_actionTypes.UPDATE, apiGeneric(apiClient));
 
-	          case 2:
-	          case 'end':
-	            return _context6.stop();
+	            case 2:
+	            case 'end':
+	              return _context6.stop();
+	          }
 	        }
-	      }
-	    }, _watchUpdate, this);
-	  });
+	      }, _watchUpdate, this);
+	    })
+	  );
 	};
 
 	var watchDelete = function watchDelete(apiClient) {
-	  return regeneratorRuntime.mark(function _watchDelete() {
-	    return regeneratorRuntime.wrap(function _watchDelete$(_context7) {
-	      while (1) {
-	        switch (_context7.prev = _context7.next) {
-	          case 0:
-	            _context7.next = 2;
-	            return (0, _effects.takeEvery)(_actionTypes.DELETE, apiGeneric(apiClient));
+	  return (/*#__PURE__*/regeneratorRuntime.mark(function _watchDelete() {
+	      return regeneratorRuntime.wrap(function _watchDelete$(_context7) {
+	        while (1) {
+	          switch (_context7.prev = _context7.next) {
+	            case 0:
+	              _context7.next = 2;
+	              return (0, _effects.takeEvery)(_actionTypes.DELETE, apiGeneric(apiClient));
 
-	          case 2:
-	          case 'end':
-	            return _context7.stop();
+	            case 2:
+	            case 'end':
+	              return _context7.stop();
+	          }
 	        }
-	      }
-	    }, _watchDelete, this);
-	  });
+	      }, _watchDelete, this);
+	    })
+	  );
 	};
 
 	var watchApiCall = function watchApiCall(apiClient) {
-	  return regeneratorRuntime.mark(function _watchApiCall() {
-	    return regeneratorRuntime.wrap(function _watchApiCall$(_context8) {
-	      while (1) {
-	        switch (_context8.prev = _context8.next) {
-	          case 0:
-	            _context8.next = 2;
-	            return (0, _effects.takeEvery)(_actionTypes.API_CALL, apiGeneric(apiClient));
+	  return (/*#__PURE__*/regeneratorRuntime.mark(function _watchApiCall() {
+	      return regeneratorRuntime.wrap(function _watchApiCall$(_context8) {
+	        while (1) {
+	          switch (_context8.prev = _context8.next) {
+	            case 0:
+	              _context8.next = 2;
+	              return (0, _effects.takeEvery)(_actionTypes.API_CALL, apiGeneric(apiClient));
 
-	          case 2:
-	          case 'end':
-	            return _context8.stop();
+	            case 2:
+	            case 'end':
+	              return _context8.stop();
+	          }
 	        }
-	      }
-	    }, _watchApiCall, this);
-	  });
+	      }, _watchApiCall, this);
+	    })
+	  );
 	};
 
 	function crudSaga(apiClient) {
-	  return regeneratorRuntime.mark(function _crudSaga() {
-	    return regeneratorRuntime.wrap(function _crudSaga$(_context9) {
-	      while (1) {
-	        switch (_context9.prev = _context9.next) {
-	          case 0:
-	            _context9.next = 2;
-	            return (0, _effects.all)([(0, _effects.fork)(watchFetch(apiClient)), (0, _effects.fork)(watchFetchOne(apiClient)), (0, _effects.fork)(watchCreate(apiClient)), (0, _effects.fork)(watchUpdate(apiClient)), (0, _effects.fork)(watchDelete(apiClient)), (0, _effects.fork)(watchApiCall(apiClient)), (0, _effects.fork)(garbageCollector)]);
+	  return (/*#__PURE__*/regeneratorRuntime.mark(function _crudSaga() {
+	      return regeneratorRuntime.wrap(function _crudSaga$(_context9) {
+	        while (1) {
+	          switch (_context9.prev = _context9.next) {
+	            case 0:
+	              _context9.next = 2;
+	              return (0, _effects.all)([(0, _effects.fork)(watchFetch(apiClient)), (0, _effects.fork)(watchFetchOne(apiClient)), (0, _effects.fork)(watchCreate(apiClient)), (0, _effects.fork)(watchUpdate(apiClient)), (0, _effects.fork)(watchDelete(apiClient)), (0, _effects.fork)(watchApiCall(apiClient)), (0, _effects.fork)(garbageCollector)]);
 
-	          case 2:
-	          case 'end':
-	            return _context9.stop();
+	            case 2:
+	            case 'end':
+	              return _context9.stop();
+	          }
 	        }
-	      }
-	    }, _crudSaga, this);
-	  });
+	      }, _crudSaga, this);
+	    })
+	  );
 	}
 
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -3687,11 +4060,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.selectRecordOrEmptyObject = selectRecordOrEmptyObject;
 	exports.selectActionStatus = selectActionStatus;
 
-	var _lodash = __webpack_require__(3);
+	var _lodash = __webpack_require__(6);
 
 	var _lodash2 = _interopRequireDefault(_lodash);
 
-	var _actionTypes = __webpack_require__(1);
+	var _actionTypes = __webpack_require__(2);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3875,23 +4248,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}
 
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(14)
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
+	exports.__esModule = true;
 
-	var _io = __webpack_require__(5);
+	var _io = /*#__PURE__*/__webpack_require__(3);
 
 	Object.defineProperty(exports, 'take', {
 	  enumerable: true,
@@ -3909,6 +4274,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  enumerable: true,
 	  get: function get() {
 	    return _io.put;
+	  }
+	});
+	Object.defineProperty(exports, 'all', {
+	  enumerable: true,
+	  get: function get() {
+	    return _io.all;
 	  }
 	});
 	Object.defineProperty(exports, 'race', {
@@ -3983,6 +4354,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return _io.flush;
 	  }
 	});
+	Object.defineProperty(exports, 'getContext', {
+	  enumerable: true,
+	  get: function get() {
+	    return _io.getContext;
+	  }
+	});
+	Object.defineProperty(exports, 'setContext', {
+	  enumerable: true,
+	  get: function get() {
+	    return _io.setContext;
+	  }
+	});
 	Object.defineProperty(exports, 'takeEvery', {
 	  enumerable: true,
 	  get: function get() {
@@ -4002,290 +4385,66 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	});
 
-/***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.UNDEFINED_INPUT_ERROR = exports.INVALID_BUFFER = exports.isEnd = exports.END = undefined;
+	exports.__esModule = true;
+	exports.throttleHelper = exports.takeLatestHelper = exports.takeEveryHelper = exports.throttle = exports.takeLatest = exports.takeEvery = undefined;
 
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	var _takeEvery = /*#__PURE__*/__webpack_require__(17);
 
-	exports.emitter = emitter;
-	exports.channel = channel;
-	exports.eventChannel = eventChannel;
-	exports.stdChannel = stdChannel;
+	var _takeEvery2 = /*#__PURE__*/_interopRequireDefault(_takeEvery);
 
-	var _utils = __webpack_require__(2);
+	var _takeLatest = /*#__PURE__*/__webpack_require__(18);
 
-	var _buffers = __webpack_require__(4);
+	var _takeLatest2 = /*#__PURE__*/_interopRequireDefault(_takeLatest);
 
-	var _scheduler = __webpack_require__(17);
+	var _throttle = /*#__PURE__*/__webpack_require__(19);
 
-	var CHANNEL_END_TYPE = '@@redux-saga/CHANNEL_END';
-	var END = exports.END = { type: CHANNEL_END_TYPE };
-	var isEnd = exports.isEnd = function isEnd(a) {
-	  return a && a.type === CHANNEL_END_TYPE;
+	var _throttle2 = /*#__PURE__*/_interopRequireDefault(_throttle);
+
+	var _utils = /*#__PURE__*/__webpack_require__(1);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var deprecationWarning = function deprecationWarning(helperName) {
+	  return 'import { ' + helperName + ' } from \'redux-saga\' has been deprecated in favor of import { ' + helperName + ' } from \'redux-saga/effects\'.\nThe latter will not work with yield*, as helper effects are wrapped automatically for you in fork effect.\nTherefore yield ' + helperName + ' will return task descriptor to your saga and execute next lines of code.';
 	};
 
-	function emitter() {
-	  var subscribers = [];
+	var takeEvery = /*#__PURE__*/(0, _utils.deprecate)(_takeEvery2.default, /*#__PURE__*/deprecationWarning('takeEvery'));
+	var takeLatest = /*#__PURE__*/(0, _utils.deprecate)(_takeLatest2.default, /*#__PURE__*/deprecationWarning('takeLatest'));
+	var throttle = /*#__PURE__*/(0, _utils.deprecate)(_throttle2.default, /*#__PURE__*/deprecationWarning('throttle'));
 
-	  function subscribe(sub) {
-	    subscribers.push(sub);
-	    return function () {
-	      return (0, _utils.remove)(subscribers, sub);
-	    };
-	  }
+	exports.takeEvery = takeEvery;
+	exports.takeLatest = takeLatest;
+	exports.throttle = throttle;
+	exports.takeEveryHelper = _takeEvery2.default;
+	exports.takeLatestHelper = _takeLatest2.default;
+	exports.throttleHelper = _throttle2.default;
 
-	  function emit(item) {
-	    var arr = subscribers.slice();
-	    for (var i = 0, len = arr.length; i < len; i++) {
-	      arr[i](item);
-	    }
-	  }
-
-	  return {
-	    subscribe: subscribe,
-	    emit: emit
-	  };
-	}
-
-	var INVALID_BUFFER = exports.INVALID_BUFFER = 'invalid buffer passed to channel factory function';
-	var UNDEFINED_INPUT_ERROR = exports.UNDEFINED_INPUT_ERROR = 'Saga was provided with an undefined action';
-
-	if (true) {
-	  exports.UNDEFINED_INPUT_ERROR = UNDEFINED_INPUT_ERROR += '\nHints:\n    - check that your Action Creator returns a non-undefined value\n    - if the Saga was started using runSaga, check that your subscribe source provides the action to its listeners\n  ';
-	}
-
-	function channel() {
-	  var buffer = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _buffers.buffers.fixed();
-
-	  var closed = false;
-	  var takers = [];
-
-	  (0, _utils.check)(buffer, _utils.is.buffer, INVALID_BUFFER);
-
-	  function checkForbiddenStates() {
-	    if (closed && takers.length) {
-	      throw (0, _utils.internalErr)('Cannot have a closed channel with pending takers');
-	    }
-	    if (takers.length && !buffer.isEmpty()) {
-	      throw (0, _utils.internalErr)('Cannot have pending takers with non empty buffer');
-	    }
-	  }
-
-	  function put(input) {
-	    checkForbiddenStates();
-	    (0, _utils.check)(input, _utils.is.notUndef, UNDEFINED_INPUT_ERROR);
-	    if (closed) {
-	      return;
-	    }
-	    if (!takers.length) {
-	      return buffer.put(input);
-	    }
-	    for (var i = 0; i < takers.length; i++) {
-	      var cb = takers[i];
-	      if (!cb[_utils.MATCH] || cb[_utils.MATCH](input)) {
-	        takers.splice(i, 1);
-	        return cb(input);
-	      }
-	    }
-	  }
-
-	  function take(cb) {
-	    checkForbiddenStates();
-	    (0, _utils.check)(cb, _utils.is.func, 'channel.take\'s callback must be a function');
-
-	    if (closed && buffer.isEmpty()) {
-	      cb(END);
-	    } else if (!buffer.isEmpty()) {
-	      cb(buffer.take());
-	    } else {
-	      takers.push(cb);
-	      cb.cancel = function () {
-	        return (0, _utils.remove)(takers, cb);
-	      };
-	    }
-	  }
-
-	  function flush(cb) {
-	    checkForbiddenStates(); // TODO: check if some new state should be forbidden now
-	    (0, _utils.check)(cb, _utils.is.func, 'channel.flush\' callback must be a function');
-	    if (closed && buffer.isEmpty()) {
-	      cb(END);
-	      return;
-	    }
-	    cb(buffer.flush());
-	  }
-
-	  function close() {
-	    checkForbiddenStates();
-	    if (!closed) {
-	      closed = true;
-	      if (takers.length) {
-	        var arr = takers;
-	        takers = [];
-	        for (var i = 0, len = arr.length; i < len; i++) {
-	          arr[i](END);
-	        }
-	      }
-	    }
-	  }
-
-	  return { take: take, put: put, flush: flush, close: close,
-	    get __takers__() {
-	      return takers;
-	    },
-	    get __closed__() {
-	      return closed;
-	    }
-	  };
-	}
-
-	function eventChannel(subscribe) {
-	  var buffer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _buffers.buffers.none();
-	  var matcher = arguments[2];
-
-	  /**
-	    should be if(typeof matcher !== undefined) instead?
-	    see PR #273 for a background discussion
-	  **/
-	  if (arguments.length > 2) {
-	    (0, _utils.check)(matcher, _utils.is.func, 'Invalid match function passed to eventChannel');
-	  }
-
-	  var chan = channel(buffer);
-	  var unsubscribe = subscribe(function (input) {
-	    if (isEnd(input)) {
-	      chan.close();
-	      return;
-	    }
-	    if (matcher && !matcher(input)) {
-	      return;
-	    }
-	    chan.put(input);
-	  });
-
-	  if (!_utils.is.func(unsubscribe)) {
-	    throw new Error('in eventChannel: subscribe should return a function to unsubscribe');
-	  }
-
-	  return {
-	    take: chan.take,
-	    flush: chan.flush,
-	    close: function close() {
-	      if (!chan.__closed__) {
-	        chan.close();
-	        unsubscribe();
-	      }
-	    }
-	  };
-	}
-
-	function stdChannel(subscribe) {
-	  var chan = eventChannel(function (cb) {
-	    return subscribe(function (input) {
-	      if (input[_utils.SAGA_ACTION]) {
-	        cb(input);
-	        return;
-	      }
-	      (0, _scheduler.asap)(function () {
-	        return cb(input);
-	      });
-	    });
-	  });
-
-	  return _extends({}, chan, {
-	    take: function take(cb, matcher) {
-	      if (arguments.length > 1) {
-	        (0, _utils.check)(matcher, _utils.is.func, 'channel.take\'s matcher argument must be a function');
-	        cb[_utils.MATCH] = matcher;
-	      }
-	      chan.take(cb);
-	    }
-	  });
-	}
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.throttle = exports.takeLatest = exports.takeEvery = undefined;
+	exports.__esModule = true;
+	exports.default = takeEvery;
 
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+	var _fsmIterator = /*#__PURE__*/__webpack_require__(5);
 
-	exports.takeEveryHelper = takeEveryHelper;
-	exports.takeLatestHelper = takeLatestHelper;
-	exports.throttleHelper = throttleHelper;
+	var _fsmIterator2 = /*#__PURE__*/_interopRequireDefault(_fsmIterator);
 
-	var _channel = __webpack_require__(15);
+	var _io = /*#__PURE__*/__webpack_require__(3);
 
-	var _utils = __webpack_require__(2);
+	var _channel = /*#__PURE__*/__webpack_require__(4);
 
-	var _io = __webpack_require__(5);
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var _buffers = __webpack_require__(4);
-
-	var done = { done: true, value: undefined };
-	var qEnd = {};
-
-	function fsmIterator(fsm, q0) {
-	  var name = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'iterator';
-
-	  var updateState = void 0,
-	      qNext = q0;
-
-	  function next(arg, error) {
-	    if (qNext === qEnd) {
-	      return done;
-	    }
-
-	    if (error) {
-	      qNext = qEnd;
-	      throw error;
-	    } else {
-	      updateState && updateState(arg);
-
-	      var _fsm$qNext = fsm[qNext](),
-	          _fsm$qNext2 = _slicedToArray(_fsm$qNext, 3),
-	          q = _fsm$qNext2[0],
-	          output = _fsm$qNext2[1],
-	          _updateState = _fsm$qNext2[2];
-
-	      qNext = q;
-	      updateState = _updateState;
-	      return qNext === qEnd ? done : output;
-	    }
-	  }
-
-	  return (0, _utils.makeIterator)(next, function (error) {
-	    return next(null, error);
-	  }, name, true);
-	}
-
-	function safeName(patternOrChannel) {
-	  if (_utils.is.channel(patternOrChannel)) {
-	    return 'channel';
-	  } else if (Array.isArray(patternOrChannel)) {
-	    return String(patternOrChannel.map(function (entry) {
-	      return String(entry);
-	    }));
-	  } else {
-	    return String(patternOrChannel);
-	  }
-	}
-
-	function takeEveryHelper(patternOrChannel, worker) {
+	function takeEvery(patternOrChannel, worker) {
 	  for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
 	    args[_key - 2] = arguments[_key];
 	  }
@@ -4300,19 +4459,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return action = ac;
 	  };
 
-	  return fsmIterator({
+	  return (0, _fsmIterator2.default)({
 	    q1: function q1() {
 	      return ['q2', yTake, setAction];
 	    },
 	    q2: function q2() {
-	      return action === _channel.END ? [qEnd] : ['q1', yFork(action)];
+	      return action === _channel.END ? [_fsmIterator.qEnd] : ['q1', yFork(action)];
 	    }
-	  }, 'q1', 'takeEvery(' + safeName(patternOrChannel) + ', ' + worker.name + ')');
+	  }, 'q1', 'takeEvery(' + (0, _fsmIterator.safeName)(patternOrChannel) + ', ' + worker.name + ')');
 	}
 
-	function takeLatestHelper(patternOrChannel, worker) {
-	  for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
-	    args[_key2 - 2] = arguments[_key2];
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports.default = takeLatest;
+
+	var _fsmIterator = /*#__PURE__*/__webpack_require__(5);
+
+	var _fsmIterator2 = /*#__PURE__*/_interopRequireDefault(_fsmIterator);
+
+	var _io = /*#__PURE__*/__webpack_require__(3);
+
+	var _channel = /*#__PURE__*/__webpack_require__(4);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function takeLatest(patternOrChannel, worker) {
+	  for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+	    args[_key - 2] = arguments[_key];
 	  }
 
 	  var yTake = { done: false, value: (0, _io.take)(patternOrChannel) };
@@ -4332,22 +4510,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return action = ac;
 	  };
 
-	  return fsmIterator({
+	  return (0, _fsmIterator2.default)({
 	    q1: function q1() {
 	      return ['q2', yTake, setAction];
 	    },
 	    q2: function q2() {
-	      return action === _channel.END ? [qEnd] : task ? ['q3', yCancel(task)] : ['q1', yFork(action), setTask];
+	      return action === _channel.END ? [_fsmIterator.qEnd] : task ? ['q3', yCancel(task)] : ['q1', yFork(action), setTask];
 	    },
 	    q3: function q3() {
 	      return ['q1', yFork(action), setTask];
 	    }
-	  }, 'q1', 'takeLatest(' + safeName(patternOrChannel) + ', ' + worker.name + ')');
+	  }, 'q1', 'takeLatest(' + (0, _fsmIterator.safeName)(patternOrChannel) + ', ' + worker.name + ')');
 	}
 
-	function throttleHelper(delayLength, pattern, worker) {
-	  for (var _len3 = arguments.length, args = Array(_len3 > 3 ? _len3 - 3 : 0), _key3 = 3; _key3 < _len3; _key3++) {
-	    args[_key3 - 3] = arguments[_key3];
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.__esModule = true;
+	exports.default = throttle;
+
+	var _fsmIterator = /*#__PURE__*/__webpack_require__(5);
+
+	var _fsmIterator2 = /*#__PURE__*/_interopRequireDefault(_fsmIterator);
+
+	var _io = /*#__PURE__*/__webpack_require__(3);
+
+	var _channel = /*#__PURE__*/__webpack_require__(4);
+
+	var _buffers = /*#__PURE__*/__webpack_require__(7);
+
+	var _utils = /*#__PURE__*/__webpack_require__(1);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function throttle(delayLength, pattern, worker) {
+	  for (var _len = arguments.length, args = Array(_len > 3 ? _len - 3 : 0), _key = 3; _key < _len; _key++) {
+	    args[_key - 3] = arguments[_key];
 	  }
 
 	  var action = void 0,
@@ -4355,7 +4556,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  var yActionChannel = { done: false, value: (0, _io.actionChannel)(pattern, _buffers.buffers.sliding(1)) };
 	  var yTake = function yTake() {
-	    return { done: false, value: (0, _io.take)(channel, pattern) };
+	    return { done: false, value: (0, _io.take)(channel) };
 	  };
 	  var yFork = function yFork(ac) {
 	    return { done: false, value: _io.fork.apply(undefined, [worker].concat(args, [ac])) };
@@ -4369,7 +4570,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return channel = ch;
 	  };
 
-	  return fsmIterator({
+	  return (0, _fsmIterator2.default)({
 	    q1: function q1() {
 	      return ['q2', yActionChannel, setChannel];
 	    },
@@ -4377,34 +4578,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return ['q3', yTake(), setAction];
 	    },
 	    q3: function q3() {
-	      return action === _channel.END ? [qEnd] : ['q4', yFork(action)];
+	      return action === _channel.END ? [_fsmIterator.qEnd] : ['q4', yFork(action)];
 	    },
 	    q4: function q4() {
 	      return ['q2', yDelay];
 	    }
-	  }, 'q1', 'throttle(' + safeName(pattern) + ', ' + worker.name + ')');
+	  }, 'q1', 'throttle(' + (0, _fsmIterator.safeName)(pattern) + ', ' + worker.name + ')');
 	}
 
-	var deprecationWarning = function deprecationWarning(helperName) {
-	  return 'import ' + helperName + ' from \'redux-saga\' has been deprecated in favor of import ' + helperName + ' from \'redux-saga/effects\'.\nThe latter will not work with yield*, as helper effects are wrapped automatically for you in fork effect.\nTherefore yield ' + helperName + ' will return task descriptor to your saga and execute next lines of code.';
-	};
-	var takeEvery = exports.takeEvery = (0, _utils.deprecate)(takeEveryHelper, deprecationWarning('takeEvery'));
-	var takeLatest = exports.takeLatest = (0, _utils.deprecate)(takeLatestHelper, deprecationWarning('takeLatest'));
-	var throttle = exports.throttle = (0, _utils.deprecate)(throttleHelper, deprecationWarning('throttle'));
-
-/***/ },
-/* 17 */
-/***/ function(module, exports) {
+/***/ }),
+/* 20 */
+/***/ (function(module, exports) {
 
 	"use strict";
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
+	exports.__esModule = true;
 	exports.asap = asap;
 	exports.suspend = suspend;
 	exports.flush = flush;
-
 	var queue = [];
 	/**
 	  Variable to hold a counting semaphore
@@ -4425,7 +4616,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    suspend();
 	    task();
 	  } finally {
-	    flush();
+	    release();
 	  }
 	}
 
@@ -4433,10 +4624,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Executes or queues a task depending on the state of the scheduler (`suspended` or `released`)
 	**/
 	function asap(task) {
+	  queue.push(task);
+
 	  if (!semaphore) {
-	    exec(task);
-	  } else {
-	    queue.push(task);
+	    suspend();
+	    flush();
 	  }
 	}
 
@@ -4449,25 +4641,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	/**
+	  Puts the scheduler in a `released` state.
+	**/
+	function release() {
+	  semaphore--;
+	}
+
+	/**
 	  Releases the current lock. Executes all queued tasks if the scheduler is in the released state.
 	**/
 	function flush() {
-	  semaphore--;
-	  if (!semaphore && queue.length) {
-	    exec(queue.shift());
+	  release();
+
+	  var task = void 0;
+	  while (!semaphore && (task = queue.shift()) !== undefined) {
+	    exec(task);
 	  }
 	}
 
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {// This method of obtaining a reference to the global object needs to be
+	/**
+	 * Copyright (c) 2014-present, Facebook, Inc.
+	 *
+	 * This source code is licensed under the MIT license found in the
+	 * LICENSE file in the root directory of this source tree.
+	 */
+
+	// This method of obtaining a reference to the global object needs to be
 	// kept identical to the way it is obtained in runtime.js
-	var g =
-	  typeof global === "object" ? global :
-	  typeof window === "object" ? window :
-	  typeof self === "object" ? self : this;
+	var g = (function() { return this })() || Function("return this")();
 
 	// Use `getOwnPropertyNames` because not all browsers support calling
 	// `hasOwnProperty` on the global `self` object in a worker. See #183.
@@ -4480,7 +4685,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// Force reevalutation of runtime.js.
 	g.regeneratorRuntime = undefined;
 
-	module.exports = __webpack_require__(19);
+	module.exports = __webpack_require__(22);
 
 	if (hadRuntime) {
 	  // Restore the original runtime.
@@ -4494,20 +4699,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
-/***/ },
-/* 19 */
-/***/ function(module, exports) {
+/***/ }),
+/* 22 */
+/***/ (function(module, exports) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {/**
-	 * Copyright (c) 2014, Facebook, Inc.
-	 * All rights reserved.
+	/**
+	 * Copyright (c) 2014-present, Facebook, Inc.
 	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * https://raw.github.com/facebook/regenerator/master/LICENSE file. An
-	 * additional grant of patent rights can be found in the PATENTS file in
-	 * the same directory.
+	 * This source code is licensed under the MIT license found in the
+	 * LICENSE file in the root directory of this source tree.
 	 */
 
 	!(function(global) {
@@ -4690,10 +4891,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	          resolve(result);
 	        }, reject);
 	      }
-	    }
-
-	    if (typeof global.process === "object" && global.process.domain) {
-	      invoke = global.process.domain.bind(invoke);
 	    }
 
 	    var previousPromise;
@@ -5229,19 +5426,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 	})(
-	  // Among the various tricks for obtaining a reference to the global
-	  // object, this seems to be the most reliable technique that does not
-	  // use indirect eval (which violates Content Security Policy).
-	  typeof global === "object" ? global :
-	  typeof window === "object" ? window :
-	  typeof self === "object" ? self : this
+	  // In sloppy mode, unbound `this` refers to the global object, fallback to
+	  // Function constructor if we're in global strict mode. That is sadly a form
+	  // of indirect eval which violates Content Security Policy.
+	  (function() { return this })() || Function("return this")()
 	);
 
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
-/***/ },
-/* 20 */
-/***/ function(module, exports) {
+/***/ }),
+/* 23 */
+/***/ (function(module, exports) {
 
 	module.exports = function(module) {
 		if(!module.webpackPolyfill) {
@@ -5255,7 +5449,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ }
+/***/ })
 /******/ ])
 });
 ;
