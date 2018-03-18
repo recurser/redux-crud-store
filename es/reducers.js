@@ -47,10 +47,9 @@ var modelInitialState = exports.modelInitialState = {
   byId: byIdInitialState,
   collections: collectionsInitialState,
   actionStatus: actionStatusInitialState
-};
 
-// holds a number of models, each of which are strucured like modelInitialState
-var initialState = {};
+  // holds a number of models, each of which are strucured like modelInitialState
+};var initialState = {};
 
 /*
  * SECTION: reducers
@@ -85,7 +84,7 @@ function byIdReducerImpl() {
       return Object.assign({}, state, _defineProperty({}, id, {
         fetchTime: action.meta.fetchTime,
         error: null,
-        record: action.payload
+        record: 'data' in action.payload ? action.payload.data : action.payload
       }));
     case _actionTypes.FETCH_ONE_ERROR:
       return Object.assign({}, state, _defineProperty({}, id, {
