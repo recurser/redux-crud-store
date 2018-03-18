@@ -77,7 +77,7 @@ function byIdReducerImpl(state = byIdInitialState, action) {
         [id]: {
           fetchTime: action.meta.fetchTime,
           error: null,
-          record: action.payload
+          record: ('data' in action.payload) ? action.payload.data : action.payload
         }
       })
     case FETCH_ONE_ERROR:
